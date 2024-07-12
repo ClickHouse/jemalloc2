@@ -184,7 +184,12 @@ nstime_get(nstime_t *time) {
 	nstime_init(time, ticks_100ns * 100);
 }
 #elif defined(JEMALLOC_HAVE_CLOCK_MONOTONIC_COARSE)
-#  define NSTIME_MONOTONIC true
+/// We have observed that in certain cases CLOCK_MONOTONIC_COARSE
+/// is not monotonic.
+/// If that's the case it is most likely a bug in kernel.
+/// Those occurances are rare and the observed difference was couple of nanoseconds
+/// which is much smaller than the precision of this clock.
+#  define NSTIME_MONOTONIC false
 static void
 nstime_get(nstime_t *time) {
 	struct timespec ts;
